@@ -14,10 +14,15 @@ public class BillingService {
     private final WalletRepository walletRepository;
 
     public void createWallet(UUID userId) {
-        walletRepository.findById(userId).orElseGet(() -> {
-            Wallet wallet = new Wallet(userId, 0L);
-            return walletRepository.save(wallet);
-        });
+        if (walletRepository.existsById(userId)) {
+            return;
+        }
+
+        Wallet wallet = new Wallet();
+        wallet.setUserId(userId);     //  ОБЯЗАТЕЛЬНО установить ID
+        wallet.setBalance(0L);        // дефолтный баланс
+
+        walletRepository.save(wallet);
     }
 
     public void topUp(UUID userId, Long amount) {
