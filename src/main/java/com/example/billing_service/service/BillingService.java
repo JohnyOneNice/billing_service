@@ -13,17 +13,36 @@ public class BillingService {
 
     private final WalletRepository walletRepository;
 
-    public void createWallet(UUID userId) {
-        if (walletRepository.existsById(userId)) {
-            return;
+    /*
+     * Создаёт кошелек для пользователя, если его еще не существует,
+     * и возвращает созданную сущность Wallet.
+     */
+
+    public Wallet createWalletAndReturn(UUID userId) {
+        if (walletRepository.existsByUserId(userId)) {
+            throw new RuntimeException("Кошелек уже существует для пользователя с ID: " + userId);
         }
 
         Wallet wallet = new Wallet();
-        wallet.setUserId(userId);     //  ОБЯЗАТЕЛЬНО установить ID
+        wallet.setUserId(userId);     //  Передается от userservice
         wallet.setBalance(0L);        // дефолтный баланс
 
-        walletRepository.save(wallet);
+        return walletRepository.save(wallet);
     }
+
+    /*
+     * Возвращает текущий баланс пользователя.
+     */
+
+    public Long getBalance(UUID userId) {
+        return walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Кошелёк не найден"))
+                .getBalance();
+    }
+
+    /*
+     * Пополняет кошелек указанной суммой.
+     */
 
     public void topUp(UUID userId, Long amount) {
         Wallet wallet = walletRepository.findById(userId).orElseThrow(() ->
@@ -31,6 +50,10 @@ public class BillingService {
         wallet.setBalance(wallet.getBalance() + amount);
         walletRepository.save(wallet);
     }
+
+    /*
+     * Снимает средства с кошелька. Если средств недостаточно — выбрасывает исключение.
+     */
 
     public void withdraw(UUID userId, Long amount) {
         Wallet wallet = walletRepository.findById(userId).orElseThrow(() ->
@@ -42,8 +65,9 @@ public class BillingService {
         walletRepository.save(wallet);
     }
 
-    public Long getBalance(UUID userId) {
-        return walletRepository.findById(userId).orElseThrow(() ->
-                new RuntimeException("Кошелёк не найден")).getBalance();
-    }
+//    public Long getBalance(UUID userId) {
+//        return walletRepository.findById(userId).orElseThrow(() ->
+//                new RuntimeException("Кошелёк не найден")).getBalance();
+//    }
+
 }

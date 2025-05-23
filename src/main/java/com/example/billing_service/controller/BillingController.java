@@ -1,7 +1,9 @@
 package com.example.billing_service.controller;
 
+import com.example.billing_service.model.Wallet;
 import com.example.billing_service.service.BillingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,9 +18,12 @@ public class BillingController {
     private final BillingService billingService;
 
     @PostMapping("/create/{userId}")
-    public ResponseEntity<Void> createWallet(@PathVariable UUID userId) {
-        billingService.createWallet(userId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UUID> createWallet(@PathVariable UUID userId) {
+        if (billingService.walletRepository.existsByUserId(userId)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+        Wallet wallet = billingService.createWalletAndReturn(userId);
+        return ResponseEntity.ok(wallet.getId()); // Возвращаем id записи
     }
 
     @PostMapping("/topup/{userId}")
