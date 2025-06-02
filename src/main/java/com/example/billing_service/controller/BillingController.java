@@ -19,7 +19,7 @@ public class BillingController {
 
     @PostMapping("/create/{userId}")
     public ResponseEntity<UUID> createWallet(@PathVariable UUID userId) {
-        if (billingService.walletRepository.existsByUserId(userId)) {
+        if (billingService.existsByUserId(userId)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         Wallet wallet = billingService.createWalletAndReturn(userId);
@@ -33,7 +33,9 @@ public class BillingController {
     }
 
     @PostMapping("/withdraw/{userId}")
-    public ResponseEntity<Void> withdraw(@PathVariable UUID userId, @RequestParam("amount") @Min(1) Long amount) {
+    public ResponseEntity<Void> withdraw(
+            @PathVariable UUID userId,
+            @RequestParam("amount") @Min(1) Long amount) {
         billingService.withdraw(userId, amount);
         return ResponseEntity.ok().build();
     }

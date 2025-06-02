@@ -12,6 +12,9 @@ import java.util.UUID;
 public class BillingService {
 
     private final WalletRepository walletRepository;
+    public boolean existsByUserId(UUID userId) {
+        return walletRepository.existsByUserId(userId);
+    }
 
     /*
      * Создаёт кошелек для пользователя, если его еще не существует,
@@ -45,8 +48,9 @@ public class BillingService {
      */
 
     public void topUp(UUID userId, Long amount) {
-        Wallet wallet = walletRepository.findById(userId).orElseThrow(() ->
-                new RuntimeException("Кошелёк не найден для пользователя: " + userId));
+        Wallet wallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Кошелёк не найден для пользователя: " + userId));
+
         wallet.setBalance(wallet.getBalance() + amount);
         walletRepository.save(wallet);
     }
@@ -56,18 +60,14 @@ public class BillingService {
      */
 
     public void withdraw(UUID userId, Long amount) {
-        Wallet wallet = walletRepository.findById(userId).orElseThrow(() ->
-                new RuntimeException("Кошелёк не найден"));
+        Wallet wallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Кошелёк не найден"));
+
         if (wallet.getBalance() < amount) {
             throw new RuntimeException("Недостаточно средств на счету");
         }
         wallet.setBalance(wallet.getBalance() - amount);
         walletRepository.save(wallet);
     }
-
-//    public Long getBalance(UUID userId) {
-//        return walletRepository.findById(userId).orElseThrow(() ->
-//                new RuntimeException("Кошелёк не найден")).getBalance();
-//    }
 
 }

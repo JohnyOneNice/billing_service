@@ -13,10 +13,13 @@ import java.util.UUID;
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+
     @Column(nullable = false, unique = true)
     private UUID id;
 
+    @Column(nullable = false, unique = true)
     private UUID userId; // ID пользователя из userservice
+
     private Long balance; // В копейках
 
     public Wallet(UUID userId, long l) {
