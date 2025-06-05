@@ -44,4 +44,14 @@ public class BillingController {
     public ResponseEntity<Long> getBalance(@PathVariable UUID userId) {
         return ResponseEntity.ok(billingService.getBalance(userId));
     }
+
+    @PostMapping("/refund/{userId}")
+    public ResponseEntity<Void> refund(@PathVariable UUID userId, @RequestParam Long amount) {
+        try {
+            billingService.refund(userId, amount);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

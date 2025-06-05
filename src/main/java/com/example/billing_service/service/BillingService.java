@@ -70,4 +70,11 @@ public class BillingService {
         walletRepository.save(wallet);
     }
 
+    public void refund(UUID userId, Long amount) {
+        Wallet wallet = walletRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Кошелёк не найден"));
+        wallet.setBalance(wallet.getBalance() + amount);
+        walletRepository.save(wallet);
+    }
+
 }
