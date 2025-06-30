@@ -1,6 +1,7 @@
 package com.example.billing_service.controller;
 
 import com.example.billing_service.model.Wallet;
+import com.example.billing_service.model.WithdrawRequest;
 import com.example.billing_service.service.BillingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,11 +33,9 @@ public class BillingController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/withdraw/{userId}")
-    public ResponseEntity<Void> withdraw(
-            @PathVariable UUID userId,
-            @RequestParam("amount") @Min(1) Long amount) {
-        billingService.withdraw(userId, amount);
+    @PostMapping("/withdraw")
+    public ResponseEntity<Void> withdraw(@RequestBody WithdrawRequest request) {
+        billingService.withdraw(request.getUserId(), request.getAmount());
         return ResponseEntity.ok().build();
     }
 
